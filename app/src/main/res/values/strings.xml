@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">FoodApp</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="home_fragment">home fragment</string>
+    <string name="categories_fragment">categories fragment</string>
+    <string name="favorites_fragment">favorites fragment</string>
+</resources>
