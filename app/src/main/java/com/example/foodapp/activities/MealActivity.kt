@@ -54,7 +54,7 @@ class MealActivity : AppCompatActivity() {
                 binding.tvLocation.text = "Area: ${meal!!.strArea}"
                 binding.tvInstructionsSteps.text = meal!!.strInstructions
 
-                youtubeLink = meal.strYoutube
+                youtubeLink = meal.strYoutube!!
             }
         })
     }
