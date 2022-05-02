@@ -1,6 +1,7 @@
 package com.example.foodapp.fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.foodapp.activities.MainActivity
-import com.example.foodapp.adapters.FavouritesMealAdapter
+import com.example.foodapp.adapters.MealAdapter
 import com.example.foodapp.databinding.FragmentFavoritesBinding
 import com.example.foodapp.viewModel.HomeViewModel
 import com.google.android.material.snackbar.Snackbar
@@ -18,7 +19,7 @@ import com.google.android.material.snackbar.Snackbar
 class FavoritesFragment : Fragment() {
     private lateinit var binding: FragmentFavoritesBinding
     private lateinit var viewModel: HomeViewModel
-    private lateinit var favouritesAdapter: FavouritesMealAdapter
+    private lateinit var favouritesAdapter: MealAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,7 +68,7 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun prepareRecyclerView() {
-        favouritesAdapter = FavouritesMealAdapter()
+        favouritesAdapter = MealAdapter()
         binding.rvFavourites.apply {
             layoutManager = GridLayoutManager(context, 2, GridLayoutManager.VERTICAL, false)
             adapter = favouritesAdapter
@@ -76,6 +77,7 @@ class FavoritesFragment : Fragment() {
 
     private fun observeFavourites() {
         viewModel.observeFavouritesMealsLiveData().observe(requireActivity() , Observer { meals ->
+            Log.e("test", meals.toString())
             favouritesAdapter.differ.submitList(meals)
         })
     }
