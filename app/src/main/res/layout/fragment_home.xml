@@ -43,7 +43,7 @@
             android:id="@+id/img_search"
             android:layout_width="@dimen/_30sdp"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"
+            android:scaleType="fitCenter"
             android:src="@drawable/ic_search"/>
 
     </LinearLayout>
