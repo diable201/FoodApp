@@ -4,9 +4,11 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.foodapp.db.MealDatabase
 import com.example.foodapp.pojo.*
 import com.example.foodapp.retrofit.RetrofitInstance
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -17,6 +19,7 @@ class HomeViewModel(private val mealDatabase: MealDatabase): ViewModel() {
     private var popularItemsLiveData = MutableLiveData<List<MealsByCategory>>()
     private var categoriesLiveData = MutableLiveData<List<Category>>()
     private var favoritesMealsLiveData = mealDatabase.mealDao().getAllMeals()
+    private var bottomSheetMealLiveData = MutableLiveData<Meal>()
 
     fun getRandomMeal() {
         RetrofitInstance.api.getRandomMeal().enqueue(object : Callback<MealList> {
@@ -33,6 +36,22 @@ class HomeViewModel(private val mealDatabase: MealDatabase): ViewModel() {
             override fun onFailure(call: Call<MealList>, t: Throwable) {
                 Log.d("HomeFragment", t.message.toString())
             }
+        })
+    }
+
+    fun getMealById(id: String) {
+        RetrofitInstance.api.getMealDetails(id).enqueue(object : Callback<MealList> {
+            override fun onResponse(call: Call<MealList>, response: Response<MealList>) {
+                val meal = response.body()?.meals?.first()
+                meal?.let { meal ->
+                    bottomSheetMealLiveData.postValue(meal)
+                }
+            }
+
+            override fun onFailure(call: Call<MealList>, t: Throwable) {
+                Log.d("HomeViewModel", t.message.toString())
+            }
+
         })
     }
 
@@ -70,6 +89,19 @@ class HomeViewModel(private val mealDatabase: MealDatabase): ViewModel() {
         })
     }
 
+    fun deleteMeal(meal: Meal) {
+        viewModelScope.launch {
+            mealDatabase.mealDao().delete(meal)
+        }
+    }
+
+
+    fun insertMeal(meal: Meal) {
+        viewModelScope.launch {
+            mealDatabase.mealDao().upsert(meal)
+        }
+    }
+
     fun observeRandomMealLiveData(): LiveData<Meal> {
         return randomMealLiveData
     }
@@ -85,4 +117,6 @@ class HomeViewModel(private val mealDatabase: MealDatabase): ViewModel() {
     fun observeFavouritesMealsLiveData(): LiveData<List<Meal>> {
         return favoritesMealsLiveData
     }
+
+    fun observerBottomSheetMealLiveData(): LiveData<Meal> = bottomSheetMealLiveData
 }
