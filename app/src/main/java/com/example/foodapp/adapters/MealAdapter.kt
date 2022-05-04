@@ -8,9 +8,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.foodapp.databinding.MealItemBinding
 import com.example.foodapp.pojo.Meal
+import com.example.foodapp.pojo.MealsByCategory
 
 class MealAdapter : RecyclerView.Adapter<MealAdapter.FavouritesMealsAdapterViewHolder>() {
     inner class FavouritesMealsAdapterViewHolder(val binding: MealItemBinding): RecyclerView.ViewHolder(binding.root)
+
+    var onItemClick: ((Meal) -> Unit)? = null
 
     private val diffUtil = object : DiffUtil.ItemCallback<Meal>() {
         override fun areItemsTheSame(oldItem: Meal, newItem: Meal): Boolean {
@@ -41,6 +44,9 @@ class MealAdapter : RecyclerView.Adapter<MealAdapter.FavouritesMealsAdapterViewH
             .load(meal.strMealThumb)
             .into(holder.binding.imgMeal)
         holder.binding.tvMealName.text = meal.strMeal
+        holder.binding.root.setOnClickListener {
+            onItemClick?.invoke(differ.currentList[position])
+        }
     }
 
     override fun getItemCount(): Int {
