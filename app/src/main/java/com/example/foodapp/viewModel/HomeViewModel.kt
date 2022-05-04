@@ -5,20 +5,25 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.foodapp.db.MealDatabase
+import com.example.foodapp.db.MealDao
 import com.example.foodapp.pojo.*
 import com.example.foodapp.retrofit.RetrofitInstance
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
-class HomeViewModel(private val mealDatabase: MealDatabase): ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val mealDao: MealDao
+) : ViewModel() {
 
     private var randomMealLiveData = MutableLiveData<Meal>()
     private var popularItemsLiveData = MutableLiveData<List<MealsByCategory>>()
     private var categoriesLiveData = MutableLiveData<List<Category>>()
-    private var favoritesMealsLiveData = mealDatabase.mealDao().getAllMeals()
+    private var favoritesMealsLiveData = mealDao.getAllMeals()
     private var bottomSheetMealLiveData = MutableLiveData<Meal>()
     private var searchedMealsLiveData = MutableLiveData<List<Meal>>()
 
@@ -26,7 +31,7 @@ class HomeViewModel(private val mealDatabase: MealDatabase): ViewModel() {
         RetrofitInstance.api.getRandomMeal().enqueue(object : Callback<MealList> {
             override fun onResponse(call: Call<MealList>, response: Response<MealList>) {
                 if (response.body() != null) {
-                    val randomMeal : Meal = response.body()!!.meals[0]
+                    val randomMeal: Meal = response.body()!!.meals[0]
                     randomMealLiveData.value = randomMeal
 //                    Log.d("TEST", "meal id ${randomMeal.idMeal} name ${randomMeal.strMeal}")
                 } else {
@@ -57,20 +62,24 @@ class HomeViewModel(private val mealDatabase: MealDatabase): ViewModel() {
     }
 
     fun getPopularItems() {
-        RetrofitInstance.api.getPopularItems("Dessert").enqueue(object : Callback<MealsByCategoryList> {
-            override fun onResponse(call: Call<MealsByCategoryList>, response: Response<MealsByCategoryList>) {
-                if (response.body() != null) {
-                    popularItemsLiveData.value = response.body()!!.meals
-                } else {
-                    return
+        RetrofitInstance.api.getPopularItems("Dessert")
+            .enqueue(object : Callback<MealsByCategoryList> {
+                override fun onResponse(
+                    call: Call<MealsByCategoryList>,
+                    response: Response<MealsByCategoryList>
+                ) {
+                    if (response.body() != null) {
+                        popularItemsLiveData.value = response.body()!!.meals
+                    } else {
+                        return
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<MealsByCategoryList>, t: Throwable) {
-                Log.d("HomeFragment", t.message.toString())
-            }
+                override fun onFailure(call: Call<MealsByCategoryList>, t: Throwable) {
+                    Log.d("HomeFragment", t.message.toString())
+                }
 
-        })
+            })
     }
 
     fun getCategories() {
@@ -92,19 +101,19 @@ class HomeViewModel(private val mealDatabase: MealDatabase): ViewModel() {
 
     fun deleteMeal(meal: Meal) {
         viewModelScope.launch {
-            mealDatabase.mealDao().delete(meal)
+            mealDao.delete(meal)
         }
     }
 
 
     fun insertMeal(meal: Meal) {
         viewModelScope.launch {
-            mealDatabase.mealDao().upsert(meal)
+            mealDao.upsert(meal)
         }
     }
 
     fun searchMeals(searchQuery: String) = RetrofitInstance.api.searchMeals(searchQuery).enqueue(
-        object: Callback<MealList> {
+        object : Callback<MealList> {
             override fun onResponse(call: Call<MealList>, response: Response<MealList>) {
                 val mealsList = response.body()?.meals
                 mealsList?.let {

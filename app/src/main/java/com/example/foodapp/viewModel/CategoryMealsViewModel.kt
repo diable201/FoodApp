@@ -7,29 +7,33 @@ import androidx.lifecycle.ViewModel
 import com.example.foodapp.pojo.MealsByCategory
 import com.example.foodapp.pojo.MealsByCategoryList
 import com.example.foodapp.retrofit.RetrofitInstance
+import dagger.hilt.android.lifecycle.HiltViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
-class CategoryMealsViewModel: ViewModel() {
+@HiltViewModel
+class CategoryMealsViewModel @Inject constructor() : ViewModel() {
 
     val mealsLiveData = MutableLiveData<List<MealsByCategory>>()
 
     fun getMealsByCategory(categoryName: String) {
-        RetrofitInstance.api.getMealsByCategory(categoryName).enqueue(object : Callback<MealsByCategoryList> {
-            override fun onResponse(
-                call: Call<MealsByCategoryList>,
-                response: Response<MealsByCategoryList>
-            ) {
-                response.body()?.let { mealsList->
-                    mealsLiveData.postValue(mealsList.meals)
+        RetrofitInstance.api.getMealsByCategory(categoryName)
+            .enqueue(object : Callback<MealsByCategoryList> {
+                override fun onResponse(
+                    call: Call<MealsByCategoryList>,
+                    response: Response<MealsByCategoryList>
+                ) {
+                    response.body()?.let { mealsList ->
+                        mealsLiveData.postValue(mealsList.meals)
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<MealsByCategoryList>, t: Throwable) {
-                Log.e("CategoryMealsViewModel", t.message.toString())
-            }
-        })
+                override fun onFailure(call: Call<MealsByCategoryList>, t: Throwable) {
+                    Log.e("CategoryMealsViewModel", t.message.toString())
+                }
+            })
     }
 
     fun observeMealsLiveData(): LiveData<List<MealsByCategory>> {

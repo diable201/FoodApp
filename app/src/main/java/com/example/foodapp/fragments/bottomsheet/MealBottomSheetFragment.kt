@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.example.foodapp.activities.MainActivity
@@ -19,14 +20,13 @@ private const val MEAL_ID = "param1"
 class MealBottomSheetFragment : BottomSheetDialogFragment() {
     private var mealId: String? = null
     private lateinit var binding: FragmentMealBottomSheetBinding
-    private lateinit var viewModel: HomeViewModel
+    private val viewModel: HomeViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             mealId = it.getString(MEAL_ID)
         }
-        viewModel = (activity as MainActivity).viewModel
     }
 
     override fun onCreateView(

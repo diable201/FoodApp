@@ -5,16 +5,21 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.foodapp.db.MealDatabase
+import com.example.foodapp.db.MealDao
 import com.example.foodapp.pojo.Meal
 import com.example.foodapp.pojo.MealList
 import com.example.foodapp.retrofit.RetrofitInstance
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
-class MealViewModel(private val mealDatabase: MealDatabase): ViewModel() {
+@HiltViewModel
+class MealViewModel @Inject constructor(
+    private val mealDao: MealDao
+): ViewModel() {
     private var mealDetailsLiveData = MutableLiveData<Meal>()
 
     fun getMealDetail(id: String) {
@@ -39,7 +44,7 @@ class MealViewModel(private val mealDatabase: MealDatabase): ViewModel() {
 
     fun insertMeal(meal: Meal) {
         viewModelScope.launch {
-            mealDatabase.mealDao().upsert(meal)
+            mealDao.upsert(meal)
         }
     }
 }
