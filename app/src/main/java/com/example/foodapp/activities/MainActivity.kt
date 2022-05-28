@@ -1,22 +1,20 @@
 package com.example.foodapp.activities
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.lifecycle.ViewModelProvider
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
 import com.example.foodapp.R
-import com.example.foodapp.db.MealDatabase
 import com.example.foodapp.viewModel.HomeViewModel
-import com.example.foodapp.viewModel.HomeViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    val viewModel: HomeViewModel by lazy {
-        val mealDatabase = MealDatabase.getInstance(this)
-        val homeViewModelProviderFactory = HomeViewModelFactory(mealDatabase)
-        ViewModelProvider(this, homeViewModelProviderFactory)[HomeViewModel::class.java]
-    }
+
+    val viewModel: HomeViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

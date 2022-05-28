@@ -11,6 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FoodApp"
+        android:name=".FoodApp"
         android:usesCleartextTraffic="true">
         <activity
             android:name=".activities.CategoryMealsActivity"
